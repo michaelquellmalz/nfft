@@ -2883,7 +2883,7 @@ void nfft_precompute_lin_psi(nfft_plan *ths)
 
   for (t=0; t<ths->d; t++)
     {
-      step=((double)(ths->m+2))/(ths->K*ths->n[t]);
+      step=((double)(ths->m+2))/(((double)ths->K)*ths->n[t]);
       for(j=0;j<=ths->K;j++)
 	{
 	  ths->psi[(ths->K+1)*t + j] = PHI(j*step,t);
