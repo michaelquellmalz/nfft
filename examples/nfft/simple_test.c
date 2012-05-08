@@ -32,12 +32,17 @@ void simple_test_nfft_1d(void)
   nfft_plan p;
   double t;
 
-  int N=14;
-  int M=19;
-  int n=32;
+  int N=1<<15;
+  int M=1<<15;
+  int n=1<<16;
 
   /** init an one dimensional plan */
-  nfft_init_1d(&p,N,M);
+  //nfft_init_1d(&p,N,M);
+  nfft_init_guru(&p, 1, &N, M, &n, 6,
+		 PRE_PHI_HUT| PRE_FULL_PSI| MALLOC_F_HAT| MALLOC_X| MALLOC_F |
+		 FFTW_INIT| FFT_OUT_OF_PLACE,
+		 FFTW_ESTIMATE| FFTW_DESTROY_INPUT);
+
 
   /** init pseudo random nodes */
   nfft_vrand_shifted_unit_double(p.x,p.M_total);
@@ -48,26 +53,30 @@ void simple_test_nfft_1d(void)
 
   /** init pseudo random Fourier coefficients and show them */
   nfft_vrand_unit_complex(p.f_hat,p.N_total);
-  nfft_vpr_complex(p.f_hat,p.N_total,"given Fourier coefficients, vector f_hat");
+  //nfft_vpr_complex(p.f_hat,p.N_total,"given Fourier coefficients, vector f_hat");
 
   /** direct trafo and show the result */
-  t=nfft_second();
-  ndft_trafo(&p);
-  t=nfft_second()-t;
-  nfft_vpr_complex(p.f,p.M_total,"ndft, vector f");
-  printf(" took %e seconds.\n",t);
+  //t=nfft_second();
+  //ndft_trafo(&p);
+  //t=nfft_second()-t;
+  //nfft_vpr_complex(p.f,p.M_total,"ndft, vector f");
+  //printf(" took %e seconds.\n",t);
 
   /** approx. trafo and show the result */
+t=nfft_second();
   nfft_trafo(&p);
-  nfft_vpr_complex(p.f,p.M_total,"nfft, vector f");
+t=nfft_second()-t;
+  //nfft_vpr_complex(p.f,p.M_total,"ndft, vector f");
+  printf(" took %e seconds.\n",t);
+  //nfft_vpr_complex(p.f,p.M_total,"nfft, vector f");
 
   /** approx. adjoint and show the result */
-  ndft_adjoint(&p);
-  nfft_vpr_complex(p.f_hat,p.N_total,"adjoint ndft, vector f_hat");
+  //ndft_adjoint(&p);
+  //nfft_vpr_complex(p.f_hat,p.N_total,"adjoint ndft, vector f_hat");
 
   /** approx. adjoint and show the result */
-  nfft_adjoint(&p);
-  nfft_vpr_complex(p.f_hat,p.N_total,"adjoint nfft, vector f_hat");
+  //nfft_adjoint(&p);
+  //nfft_vpr_complex(p.f_hat,p.N_total,"adjoint nfft, vector f_hat");
 
   /** finalise the one dimensional plan */
   nfft_finalize(&p);

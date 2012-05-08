@@ -30,9 +30,9 @@
 
 #include <complex.h>
 
+#include "infft.h"
 #include "nfft3util.h"
 #include "nfft3.h"
-#include "infft.h"
 
 /** direct computation of non equispaced fourier transforms
  *  ndft_trafo, ndft_conjugated, ndft_adjoint, ndft_transposed
@@ -909,12 +909,11 @@ void nfft_trafo_1d(nfft_plan *ths)
   N=ths->N[0];
   n=ths->n[0];
 
+  TIC(0)
   f_hat1=ths->f_hat;
   f_hat2=&ths->f_hat[N/2];
   g_hat1=&ths->g_hat[n-N/2];
   g_hat2=ths->g_hat;
-
-  TIC(0)
   memset(ths->g_hat,0,ths->n_total*sizeof(double _Complex));
   if(ths->nfft_flags & PRE_PHI_HUT)
     {
@@ -956,20 +955,19 @@ void nfft_adjoint_1d(nfft_plan *ths)
   ths->g_hat=ths->g1;
   ths->g=ths->g2;
 
-  f_hat1=ths->f_hat;
-  f_hat2=&ths->f_hat[N/2];
-  g_hat1=&ths->g_hat[n-N/2];
-  g_hat2=ths->g_hat;
-
   TIC(2)
   nfft_adjoint_1d_B(ths);
-  TOC(0)
+  TOC(2)
 
   TIC_FFTW(1)
   fftw_execute(ths->my_fftw_plan2);
   TOC_FFTW(1);
 
   TIC(0)
+  f_hat1=ths->f_hat;
+  f_hat2=&ths->f_hat[N/2];
+  g_hat1=&ths->g_hat[n-N/2];
+  g_hat2=ths->g_hat;
   if(ths->nfft_flags & PRE_PHI_HUT)
     {
       c_phi_inv1=ths->c_phi_inv[0];
@@ -1549,9 +1547,8 @@ void nfft_trafo_2d(nfft_plan *ths)
 	    g_hat[k0*n1+k1]                   = f_hat[(N0/2+k0)*N1+N1/2+k1] * ck02 * ck12;
 	  }
       }
-
   TOC(0)
-
+    
   TIC_FFTW(1)
   fftw_execute(ths->my_fftw_plan1);
   TOC_FFTW(1);
